@@ -1,14 +1,14 @@
 import { friend } from "../models/friend.js";
 import { message } from "../models/message.js";
 // import {} from "r"
-import { user } from "../models/user.js";
+import { User } from "../models/user.js";
 
 
 export const addfriend = async (req, res, next) => {
     const { email } = req.body;
-    const myId = req.User._id;
-    const myemail = req.User.email;
-    let friendId = await user.findOne({ email });
+    const myId = req.user._id;
+    const myemail = req.user.email;
+    let friendId = await User.findOne({ email });
     // console.log(friendId)
     if (!friendId) return res.status(404).json({
         success: true,
@@ -29,7 +29,7 @@ export const addfriend = async (req, res, next) => {
         friendId, myId, name, email
     })
     await friend.create({
-        friendId: myId, myId: friendId, name: req.User.name, email: myemail
+        friendId: myId, myId: friendId, name: req.user.name, email: myemail
     })
 
     res.status(201).json({
@@ -39,7 +39,7 @@ export const addfriend = async (req, res, next) => {
 }
 
 export const myfriends = async (req, res, next) => {
-    const myId = req.User._id;
+    const myId = req.user._id;
     let friends = await friend.find({ myId });
     if (friends.length === 0) return res.status(404).json({
         success: false,
@@ -59,22 +59,22 @@ export const searchFriend = async (req, res, next) => {
         const { search } = req.params;
         // Create a case-insensitive regular expression for partial matching
         const regex = new RegExp(search, 'i');
-        // Use the regex in the query to find users with names matching the pattern
-        let users = await user.find({ name: { $regex: regex } });
+        // Use the regex in the query to find Users with names matching the pattern
+        let Users = await User.find({ name: { $regex: regex } });
 
-        const myId = req.User.id;
-        const filteredUsers = users.filter(user => user._id.toString() !== myId);
-        users = filteredUsers;
-        if (!users.length) {
+        const myId = req.user.id;
+        const filteredUsers = Users.filter(User => User._id.toString() !== myId);
+        Users = filteredUsers;
+        if (!Users.length) {
             return res.status(404).json({
                 success: false,
-                message: 'user not found'
+                message: 'User not found'
             })
         }
 
         return res.status(200).json({
             success: true,
-            users
+            Users
         })
     } catch (error) {
         console.log(error)
@@ -84,9 +84,9 @@ export const deleteFriend = async (req, res) => {
     const { email } = req.params;
     
     try {
-        const friendId = await user.findOne({email});
+        const friendId = await User.findOne({email});
         // console.log(friendId);
-        const myId = req.User.id;
+        const myId = req.user.id;
 
         await friend.deleteOne({ friendId: friendId, myId: myId });
         await friend.deleteOne({ friendId: myId, myId: friendId });

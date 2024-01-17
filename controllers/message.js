@@ -1,12 +1,12 @@
 import { message } from "../models/message.js";
-import { user } from "../models/user.js";
+import { User } from "../models/user.js";
 import Jwt from "jsonwebtoken";
 
 export const sendMessage = async (req, res, next) => {
     try {
         const { text } = req.body;
         const { email } = req.params;
-        let nextid = await user.findOne({ email })
+        let nextid = await User.findOne({ email })
         if (!nextid) return res.status(404).json({
             success: true,
             message: "Invalid user Id"
@@ -15,8 +15,8 @@ export const sendMessage = async (req, res, next) => {
         const name = nextid.name;
         const date = new Date(Date.now());
         // console.log(date)
-        const myid = await req.User._id;
-        const myemail = await req.User.email;
+        const myid = await req.user._id;
+        const myemail = await req.user.email;
         if (email === myemail) return res.status(404).json({
             success: false,
             message: "cannot add same person"
@@ -55,8 +55,8 @@ const fetchMessages = async (res, myid, otherUserId, sent) => {
 export const sentMessages = async (req, res) => {
     try {
         const { email } = req.params;
-        const myid = req.User._id;
-        const nextUser = await user.findOne({ email });
+        const myid = req.user._id;
+        const nextUser = await User.findOne({ email });
 
         if (!nextUser) {
             return res.status(404).json({
@@ -79,8 +79,8 @@ export const sentMessages = async (req, res) => {
 export const receiveMessages = async (req, res) => {
     try {
         const { email } = req.params;
-        const myid = req.User._id;
-        const nextUser = await user.findOne({ email });
+        const myid = req.user._id;
+        const nextUser = await User.findOne({ email });
 
         if (!nextUser) {
             return res.status(404).json({

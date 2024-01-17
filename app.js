@@ -13,16 +13,21 @@ config({
 })
 
 // middlewares
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin',process.env.FRONTEND_URL );
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials
-    next();
-  });
+// app.use((req, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin',process.env.FRONTEND_URL );
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//     res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials
+//     next();
+//   });
   
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+  }));
+
 
 app.use("/api/v1/user",UserRouter);
 app.use("/api/v1/messages",messageRouter);

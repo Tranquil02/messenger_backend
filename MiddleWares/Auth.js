@@ -1,24 +1,32 @@
-import  Jwt from "jsonwebtoken";
-import { user } from "../models/user.js";
+import jwt from "jsonwebtoken";
+
+import dotenv from "dotenv";
+import { User } from "../models/user.js";
+
+// Load environment variables from .env file
+dotenv.config();
 
 export const isAuthorised = async (req, res, next) => {
     try {
-        const secretkey = "hsuhifjksoldk";
         const { token } = req.cookies;
-        if (!token) return res.status(404).json({
-            success: false,
-            message: "Login False"
-        });
-        // req.Token=token;
-        // console.log(req.Token)
-        const decodeToken = Jwt.verify(token, secretkey);
-        req.User = await user.findById(decodeToken.id);
+
+        if (!token) {
+            return res.status(401).json({ // Use 401 Unauthorized status code
+                success: false,
+                message: "Unauthorized. Please log in."
+            });
+        }
+
+        const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decodeToken.id).select("-password"); // Exclude password field
+
+        req.user = user;
         next();
     } catch (error) {
         console.log(error);
         res.status(500).json({
             success: false,
-            message: "Authorization Error"
+            message: "Internal Server Error"
         });
     }
 };

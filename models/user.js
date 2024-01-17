@@ -9,4 +9,4 @@ const userschema=new Schema({
     // },
 })
 
-export const user=mongoose.model("users",userschema);
+export const User=mongoose.model("users",userschema);

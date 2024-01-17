@@ -1,17 +1,17 @@
-import { user } from "../models/user.js";
+import { User } from "../models/user.js";
 import { setcookie } from "../utils/features.js";
 import bcrypt from "bcryptjs";
 
 export const registerUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
-        const isUser = await user.findOne({ email });
+        const isUser = await User.findOne({ email });
         if (isUser) return res.status(404).json({
             success: true,
             message: "user already exist"
         });
         const hashed = bcrypt.hashSync(password, 10);
-        const userData = await user.create({
+        const userData = await User.create({
             name, email, password: hashed
         })
         // console.log(userData._id);
@@ -24,7 +24,7 @@ export const registerUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const isUser = await user.findOne({ email });
+        const isUser = await User.findOne({ email });
         if (!isUser) return res.status(404).json({
             success: false,
             message: "Invalid user or Password"
@@ -55,6 +55,6 @@ export const logout=(req,res,next)=>{
 export const myDetails=async(req,res,next)=>{
     res.json({
         success:true,
-        users:req.User
+        users:req.user
     })
 }
